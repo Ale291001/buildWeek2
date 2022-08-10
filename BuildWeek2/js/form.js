@@ -42,8 +42,18 @@ class Form {
         let div = document.createElement("div")
         div.className = `form-floating col-sm-${obj.col}`
 
-        let input = document.createElement("input")
-        input.type = obj.type
+        let input;
+
+        if (obj.type == 'textarea') {
+            input = document.createElement("textarea")
+            input.style = obj.style;
+
+        } else {
+            input = document.createElement("input")
+            input.type = obj.type
+
+        }
+
         input.className = obj.classInput
         input.id = obj.id
         input.placeholder = obj.title
@@ -54,6 +64,8 @@ class Form {
         label.innerHTML = obj.title
         label.htmlFor = obj.id
 
+
+        //scrive all interno degli input
         if (this.isUpdate) {
             let value = user[obj.id]
             switch (obj.id) {
@@ -68,11 +80,12 @@ class Form {
                         user.address && (input.value = user.address[obj.id.split('-')[1]])
                         break;
                     }
-
-                    if (obj.id.includes("company")) {                        
+                    
+                    if (obj.id.includes("company")) {
                         user.company && (input.value = user.company[obj.id.split('-')[1]])
                         break;
                     }
+                    
                     value && (input.value = value)
             }
         }
@@ -112,7 +125,7 @@ class Form {
                 this.callFetch()
                     .then(users => {
                         users.forEach(element => {
-                            if (element['username'].toUpperCase() == username.value.toUpperCase()) {
+                            if (element.id != this.id && element.username.toUpperCase() == username.value.toUpperCase()) {
 
                                 alredyUse = true;
 
@@ -197,7 +210,65 @@ class Form {
     }
 
     updateUser() {
-        console.log('update')
+        let data = {
+            address : {},
+            company : {}
+        }
+
+        for (let value of this.allInputs) {
+            switch (value.id) {
+                case 'firstName':
+                    data.name = value.value.replaceAll(' ', '-')
+                    break;
+                case 'lastName':
+                    data.name += ' ' + value.value.replaceAll(' ', '-')
+                    break;
+                case 'username':
+                    data.username = value.value
+                    break;
+                case 'email':
+                    data.email = value.value
+                    break;
+                case 'phone':
+                    data.phone = value.value
+                    break;
+                default:
+                    if (value.id.includes("address")) {
+                        Object.assign(data.address, {[value.id.split('-')[1]] : value.value})                       
+                        break;
+                    }
+
+                    if (value.id.includes("company")) {
+                        Object.assign(data.company, {[value.id.split('-')[1]] : value.value})      
+                        break;
+                    }
+
+            }
+        }
+
+        //setto le opzioni per l'inserimento di un nuovo utente
+        let options = {
+            method: 'PUT',
+            body: JSON.stringify(data),
+            headers: { "content-type": "application/json" }
+        }
+
+        //applico le opzioni al indirizzo corretto 
+        fetch(userAPI +'/'+ this.id, options)
+            .then(res => res.json())
+            .then(res => {
+                Swal.fire({
+                    position: 'top',
+                    icon: 'success',
+                    title: 'Utente aggiornato',
+                    text: `L'utente ${res.name} con id ${res.id} è stato aggiornato `,
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    location.href = 'index.html';
+                })
+
+            })
     }
 }
 
@@ -359,6 +430,16 @@ function updateUserForm() {
             title: 'Titolo di studio',
             required: false,
             col: 6
+        },
+        {
+            type: 'textarea',
+            style: 'height: 100px',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'company-catchPhrase',
+            title: 'Slogan',
+            required: false,
+            col: 12
         }
     ]
 
