@@ -3,17 +3,41 @@ class Form {
     //al costruttore passo un array con tutti gli input da creare e il target dove inserire gli elementi DOM
     constructor(newInputs, target) {
 
+        this.isUpdate = location.href.includes('/form.html?update');
+
+        if (this.isUpdate) {
+            let url = new URL(decodeURIComponent(location.href))
+            this.id = url.searchParams.get('id')
+        }
+
         this.form = document.createElement("form")
         this.form.className = "needs-validation"
 
-        this.createForm(newInputs);
+
+        if (this.isUpdate) {
+            this.callFetch(this.id)
+                .then(user => {
+                    console.log(user)
+                    this.createForm(newInputs, user);
+                })
+
+        } else {
+
+            this.createForm(newInputs);
+        }
 
         document.querySelector(target).append(this.form)
     }
 
+    async callFetch(id = '') {
+        const response = await fetch(userAPI + '/' + id)
+        const data = await response.json();
+        return data;
+    }
+
     //ottenendo un oggetto come parametro prendo i suoi valori interni per parametrizzare i vari elementi
     //e ritorno il div che contiene i suddetti
-    createInput(obj) {
+    createInput(obj, user) {
 
         let div = document.createElement("div")
         div.className = `form-floating col-sm-${obj.col}`
@@ -30,24 +54,47 @@ class Form {
         label.innerHTML = obj.title
         label.htmlFor = obj.id
 
+        if (this.isUpdate) {
+            let value = user[obj.id]
+            switch (obj.id) {
+                case 'firstName':
+                    input.value = (user.name.split(' '))[0].replaceAll('-', ' ')
+                    break;
+                case 'lastName':
+                    input.value = (user.name.split(' '))[1].replaceAll('-', ' ')
+                    break;
+                default:
+                    if (obj.id.includes("address")) {
+                        user.address && (input.value = user.address[obj.id.split('-')[1]])
+                        break;
+                    }
+
+                    if (obj.id.includes("company")) {                        
+                        user.company && (input.value = user.company[obj.id.split('-')[1]])
+                        break;
+                    }
+                    value && (input.value = value)
+            }
+        }
+
         div.append(input, label)
         return div;
     }
 
     //creo il contenitore per gli input e tramite l'array di oggetti chiamo il metodo per crearli
     //infine creo il bottone inserisco il tutto nel elemento form
-    createForm(newInputs) {
+    createForm(newInputs, user) {
 
         let div = document.createElement("div");
         div.className = "container mx-auto row g-3"
 
         for (let input of newInputs) {
-            div.append(this.createInput(input))
+            div.append(this.createInput(input, user))
         }
 
         let button = document.createElement('button')
         button.className = "col-12 btn btn-success btn-lg"
-        button.innerHTML = 'Salva utente'
+        this.isUpdate ? button.innerHTML = 'Aggiorna utente' : button.innerHTML = 'Salva utente'
 
         button.addEventListener("click", (e) => {
             e.preventDefault();
@@ -61,35 +108,36 @@ class Form {
             let username = Array.from(this.allInputs).find(node => node.id == 'username')
             let alredyUse = false
 
-            if(this.allInputs.length == newInputs.length){
-            fetch(userAPI)
-                .then(res => res.json())
-                .then(users => {
-                    users.forEach(element => {
-                        if (element['username'].toUpperCase() == username.value.toUpperCase()) {
+            if (this.allInputs.length == newInputs.length) {
+                this.callFetch()
+                    .then(users => {
+                        users.forEach(element => {
+                            if (element['username'].toUpperCase() == username.value.toUpperCase()) {
 
-                            alredyUse = true;
+                                alredyUse = true;
 
-                            console.log('Username già in uso')
+                                console.error('Username già in uso')
+                            }
+                        });
+                    })
+
+                    //verifico che gli elementi validi abbiano la stessa lunghezza degli input creati
+                    //se questa condizione è vera creo l'utente
+                    .then(() => {
+                        if (!alredyUse) {
+                            this.isUpdate ? this.updateUser() : this.saveUser();
+                        } else {
+                            username.value = '';
+
+                            if (username.parentNode.querySelectorAll('.invalid-feedback').length == 0) {
+
+                                let div = document.createElement('div')
+                                div.className = 'invalid-feedback'
+                                div.innerHTML = 'Username già in uso'
+                                username.parentNode.append(div);
+                            }
                         }
-                    });
-                })
-
-                //verifico che gli elementi validi abbiano la stessa lunghezza degli input creati
-                //se questa condizione è vera creo l'utente
-                .then(() => {
-                    if (!alredyUse) {
-                         this.saveUser();
-                    }else{
-                        username.value = '';
-                        username.classList.add('is-invalid')
-
-                        let div = document.createElement('div')
-                        div.className = 'invalid-feedback'
-                        div.innerHTML = 'Username già in uso'
-                        username.parentNode.append(div);
-                    }
-                })
+                    })
             }
         })
 
@@ -105,10 +153,10 @@ class Form {
         for (let value of this.allInputs) {
             switch (value.id) {
                 case 'firstName':
-                    data.name = value.value
+                    data.name = value.value.replaceAll(' ', '-')
                     break;
                 case 'lastName':
-                    data.name += ' ' + value.value
+                    data.name += ' ' + value.value.replaceAll(' ', '-')
                     break;
                 case 'username':
                     data.username = value.value
@@ -146,6 +194,10 @@ class Form {
                 })
 
             })
+    }
+
+    updateUser() {
+        console.log('update')
     }
 }
 
@@ -204,3 +256,113 @@ function createUserForm() {
     //creo un elemento con classe form con input e target personalizzati
     let form = new Form(newInput, '#target-form')
 }
+
+function updateUserForm() {
+
+    //creo un array con gli input desiderati 
+    let newInput = [
+        {
+            type: 'text',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'firstName',
+            title: 'Nome*',
+            required: true,
+            col: 4
+        },
+        {
+            type: 'text',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'lastName',
+            title: 'Cognome*',
+            required: true,
+            col: 4
+        },
+        {
+            type: 'text',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'username',
+            title: 'Username*',
+            required: true,
+            col: 4
+        },
+        {
+            type: 'email',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'email',
+            title: 'Email*',
+            required: true,
+            col: 6
+        },
+        {
+            type: 'tel',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'phone',
+            title: 'Telefono*',
+            required: true,
+            col: 6
+        },
+        {
+            type: 'text',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'address-street',
+            title: 'Indirizzo',
+            required: false,
+            col: 4
+        },
+        {
+            type: 'text',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'address-suite',
+            title: 'N° civico',
+            required: false,
+            col: 2
+        },
+        {
+            type: 'text',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'address-city',
+            title: 'Città',
+            required: false,
+            col: 4
+        },
+        {
+            type: 'text',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'address-zipcode',
+            title: 'CAP',
+            required: false,
+            col: 2
+        },
+        {
+            type: 'text',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'company-name',
+            title: 'Società',
+            required: false,
+            col: 6
+        },
+        {
+            type: 'text',
+            classInput: 'form-control',
+            classLabel: 'form-label',
+            id: 'company-bs',
+            title: 'Titolo di studio',
+            required: false,
+            col: 6
+        }
+    ]
+
+    //creo un elemento con classe form con input e target personalizzati
+    let form = new Form(newInput, '#target-form')
+}
+

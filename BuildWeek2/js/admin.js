@@ -52,7 +52,7 @@ class Table {
             for (let data of array) {
 
                 let td = document.createElement("td")
-                td.innerHTML = user[data]
+                td.innerHTML = user[data].replaceAll('-', ' ')
                 tr.append(td)
 
             }
@@ -63,7 +63,7 @@ class Table {
             btnUpdate.className = "btn btn-warning me-1"
             btnUpdate.innerHTML = "Modifica"
             btnUpdate.addEventListener('click', () => {
-                this.updateUser(user.id)
+                location.href = 'form.html?update' + encodeURIComponent('&id=' + user.id);
             })
 
             let btnDelete = document.createElement("button")
