@@ -199,7 +199,7 @@ class Form {
                     position: 'top',
                     icon: 'success',
                     title: 'Utente creato',
-                    text: `L'utente ${res.name} è stato creato all'id ${res.id}`,
+                    text: `L'utente ${res.name.replaceAll('-', ' ')} è stato creato all'id ${res.id}`,
                     showConfirmButton: false,
                     timer: 2000
                 }).then(() => {
@@ -261,7 +261,7 @@ class Form {
                     position: 'top',
                     icon: 'success',
                     title: 'Utente aggiornato',
-                    text: `L'utente ${res.name} con id ${res.id} è stato aggiornato `,
+                    text: `L'utente ${res.name.replaceAll('-', ' ')} con id ${res.id} è stato aggiornato `,
                     showConfirmButton: false,
                     timer: 2000
                 }).then(() => {

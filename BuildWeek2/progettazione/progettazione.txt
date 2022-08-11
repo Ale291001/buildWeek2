@@ -39,5 +39,8 @@ all'interno della pagina è possibile modificare i propri dati ed eventualmente 
 jwt
 
 
-
+inserire dati utente nella sezione utente 
+collegare i bottoni di modifica utente
+collegare i post
+fare la home
 

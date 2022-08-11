@@ -123,7 +123,7 @@ class Table {
                                 position: 'top',
                                 icon: 'success',
                                 title: 'Utente eliminato',
-                                text: `L'utente ${res.name} è stato eliminato`,
+                                text: `L'utente ${res.name.replaceAll('-', ' ')} è stato eliminato`,
                                 showConfirmButton: false,
                                 timer: 2000
                             }).then(() => tr.remove())
