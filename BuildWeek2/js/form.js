@@ -80,12 +80,12 @@ class Form {
                         user.address && (input.value = user.address[obj.id.split('-')[1]])
                         break;
                     }
-                    
+
                     if (obj.id.includes("company")) {
                         user.company && (input.value = user.company[obj.id.split('-')[1]])
                         break;
                     }
-                    
+
                     value && (input.value = value)
             }
         }
@@ -211,8 +211,8 @@ class Form {
 
     updateUser() {
         let data = {
-            address : {},
-            company : {}
+            address: {},
+            company: {}
         }
 
         for (let value of this.allInputs) {
@@ -234,12 +234,12 @@ class Form {
                     break;
                 default:
                     if (value.id.includes("address")) {
-                        Object.assign(data.address, {[value.id.split('-')[1]] : value.value})                       
+                        Object.assign(data.address, { [value.id.split('-')[1]]: value.value })
                         break;
                     }
 
                     if (value.id.includes("company")) {
-                        Object.assign(data.company, {[value.id.split('-')[1]] : value.value})      
+                        Object.assign(data.company, { [value.id.split('-')[1]]: value.value })
                         break;
                     }
 
@@ -254,7 +254,7 @@ class Form {
         }
 
         //applico le opzioni al indirizzo corretto 
-        fetch(userAPI +'/'+ this.id, options)
+        fetch(userAPI + '/' + this.id, options)
             .then(res => res.json())
             .then(res => {
                 Swal.fire({
@@ -264,6 +264,11 @@ class Form {
                     text: `L'utente ${res.name.replaceAll('-', ' ')} con id ${res.id} è stato aggiornato `,
                     showConfirmButton: false,
                     timer: 2000
+                }).then(() => {
+                    let logged = sessionStorage.getItem('loggedUser')
+                    data.id = this.id
+                    logged && sessionStorage.setItem('loggedUser', JSON.stringify({header: true, user: data}))
+
                 }).then(() => {
                     location.href = 'index.html';
                 })
