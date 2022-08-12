@@ -17,7 +17,6 @@ class Form {
         if (this.isUpdate) {
             this.callFetch(this.id)
                 .then(user => {
-                    console.log(user)
                     this.createForm(newInputs, user);
                 })
 
@@ -267,7 +266,7 @@ class Form {
                 }).then(() => {
                     let logged = sessionStorage.getItem('loggedUser')
                     data.id = this.id
-                    logged && sessionStorage.setItem('loggedUser', JSON.stringify({header: true, user: data}))
+                    logged && sessionStorage.setItem('loggedUser', JSON.stringify({ header: true, user: data }))
 
                 }).then(() => {
                     location.href = 'index.html';

@@ -3,7 +3,7 @@ class Table {
 
         this.table = document.createElement("table");
 
-        this.table.className = "container table table-sm table-secondary table-hover text-center align-middle"
+        this.table.className = "container table table-sm.tablepadding text-primary table-hover text-center align-middle"
 
         this.createThead()
         this.createTbody(users)
@@ -16,7 +16,7 @@ class Table {
         let thead = document.createElement("thead");
 
         let tr = document.createElement("tr")
-        tr.className = "table-dark"
+        tr.className = "table-primary "
 
         let titles = ["#", "Username", "Name", "Email", "Options"]
 
@@ -46,6 +46,7 @@ class Table {
             let th = document.createElement("th");
             th.setAttribute("scope", "row");
             th.innerHTML = user.id;
+            th.className = "text-primary"
 
             tr.append(th)
 
@@ -60,7 +61,7 @@ class Table {
             let td = document.createElement("td")
 
             let btnUpdate = document.createElement("button")
-            btnUpdate.className = "btn btn-warning me-1"
+            btnUpdate.className = "btn btn-outline-primary me-1"
             btnUpdate.innerHTML = "Modifica"
             btnUpdate.addEventListener('click', () => {
                 location.href = 'form.html?update' + encodeURIComponent('&id=' + user.id);

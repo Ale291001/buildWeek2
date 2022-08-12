@@ -1,4 +1,5 @@
 const userAPI = 'https://62ebe240705264f263e2c5b2.mockapi.io/api/1/usersBW'
+const homePostAPI = 'https://62ebe240705264f263e2c5b2.mockapi.io/api/1/homePost'
 
 location.href.includes('/form.html?create') && createUserForm(userAPI);
 

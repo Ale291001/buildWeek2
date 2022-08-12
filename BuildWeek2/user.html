@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User-page</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.min.css">
 </head>
 
 <body>
@@ -60,26 +60,20 @@
                         <form id="new-post" class="needs-validation">
                             <h4 class="text-center text-primary py-3">Nuovo post</h4>
 
-                            <textarea class='form-control' rows="5" required></textarea>
-                            <button class="btn btn-primary container mt-2">
-                                Pubblica
-                            </button>
                         </form>
 
                     </div>
 
-                    <div id="old-post" class="container">
+                    <div class="container">
 
                         <div>
                             <h4 class="text-center text-primary py-3">Post Inseriti</h4>
                         </div>
 
-                        <article class="bg-light bg-opacity-75 container border-bottom border-primary rounded p-3 mb-2">
-                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nam blanditiis totam ut sint
-                            itaque,
-                            quo molestiae voluptatem, repudiandae, dolorem repellendus tempore placeat! Quod aperiam
-                        </article>
+                        <div id="old-post">
 
+                        </div>
+                            
                     </div>
 
 
@@ -115,6 +109,8 @@
     </main>
 
     <script src="node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+    
+    <script src="js/form.js"></script>
     <script src="js/table.js"></script>
     <script src="js/script.js"></script>
     <script src="js/user.js"></script>
